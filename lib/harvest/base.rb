@@ -4,9 +4,21 @@ module Harvest
     
     # @see Harvest.client
     # @see Harvest.hardy_client
-    def initialize(subdomain, username, password, options = {})
+    def initialize *args
+      if args and (args.length == 2 or (args.length == 3 and args.last.is_a?(Hash)))
+        subdomain, token, options = args[0], args[1], args[2]
+      elsif args and (args.length == 3 or args.length == 4)
+        subdomain, username, password, options = args[0], args[1], args[2], args[3]
+      else
+        raise ArgumentError
+      end
+      options ||= {}
       options[:ssl] = true if options[:ssl].nil?
-      @credentials = Credentials.new(subdomain, username, password, options[:ssl])
+      @credentials = unless token
+        Harvest::Credentials::Basic.new(subdomain, username, password, options[:ssl])
+      else
+        Harvest::Credentials::OAuth.new(subdomain, token, options[:ssl])        
+      end
       raise InvalidCredentials unless credentials.valid?
     end
     

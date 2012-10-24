@@ -20,6 +20,10 @@ module HarvestedHelpers
     Harvest.hardy_client(credentials["subdomain"], credentials["username"], credentials["password"], :ssl => true)
   end
 
+  def oauth_harvest
+    Harvest.oauth_client(credentials["subdomain"], credentials["token"], :ssl => true)
+  end
+
   def self.clean_remote
     harvest = simple_harvest
     harvest.users.all.each do |u|

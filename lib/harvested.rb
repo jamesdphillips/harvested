@@ -11,7 +11,6 @@ require 'ext/hash'
 require 'ext/date'
 require 'ext/time'
 
-require 'harvest/credentials'
 require 'harvest/errors'
 require 'harvest/hardy_client'
 require 'harvest/timezones'
@@ -21,6 +20,7 @@ require 'harvest/base'
 %w(crud activatable).each {|a| require "harvest/behavior/#{a}"}
 %w(model client contact project task user rate_limit_status task_assignment user_assignment expense_category expense time_entry invoice_category line_item invoice).each {|a| require "harvest/#{a}"}
 %w(base account clients contacts projects tasks users task_assignments user_assignments expense_categories expenses time reports invoice_categories invoices).each {|a| require "harvest/api/#{a}"}
+%w(base basic oauth).each {|a| require "harvest/credentials/#{a}"}
 
 module Harvest
   VERSION = File.read(File.expand_path(File.join(File.dirname(__FILE__), '..', 'VERSION'))).strip
@@ -64,6 +64,10 @@ module Harvest
     def hardy_client(subdomain, username, password, options = {})
       retries = options.delete(:retry)
       Harvest::HardyClient.new(client(subdomain, username, password, options), (retries || 5))
+    end
+
+    def oauth_client(subdomain, token, options = {})
+      Harvest::Base.new(subdomain, token, options)
     end
   end
 end
